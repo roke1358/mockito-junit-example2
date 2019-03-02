@@ -1,6 +1,7 @@
 package com.example.mockitojunit.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,17 +16,22 @@ public class ItemBusinessService {
 	@Autowired
 	private ItemRepository itemRepository;
 
-	public Item getHardcodedItem() {
-		return new Item(1, "ball", 10, 100);		
-	}
-	
 	public List<Item> findAllItems() {
 		
-		return itemRepository.findAll();
+		List<Item> items = itemRepository.findAll();
+		
+		//Business logic
+		for(Item item:items) {
+			item.setValue(item.getQuantity() * item.getPrice());
+		}
+		
+		return items;
 	}
 	
-	public Item findOne(int id) {
+	public Optional<Item> findOne(int id) {
 		
-		return itemRepository.getOne(id);
+		Optional<Item> item = itemRepository.findById(id); 
+		return item;
+		
 	}
 }

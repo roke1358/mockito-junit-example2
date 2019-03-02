@@ -18,8 +18,13 @@ import com.example.mockitojunit.model.Item;
 import com.example.mockitojunit.service.ItemBusinessService;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Arrays;
+import java.util.Optional;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyInt;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(ItemController.class)
@@ -31,32 +36,37 @@ public class ItemControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
-	@Test
-	public void dummyItem_basic() throws Exception {
-		
-		RequestBuilder request = MockMvcRequestBuilders
-				.get("/dummy-item")
-				.accept(MediaType.APPLICATION_JSON);
-		
-		MvcResult result = mockMvc.perform(request)
-				.andExpect(status().isOk())
-				.andExpect(content().json("{\"id\":1,\"name\":\"ball\",\"price\":10,\"quantity\":100}"))
-				.andReturn();
-				
-	}
 
 	@Test
-	public void itemFromBusinessService_basic() throws Exception {
+	public void findOne_basic() throws Exception {
 		
-		when(businessService.getHardcodedItem()).thenReturn(new Item(2,"Item 2", 5,20));
+		Item item = new Item(2,"Item 2", 5, 20);
+		when(businessService.findOne(anyInt())).thenReturn(Optional.of(item));
 		
 		RequestBuilder request = MockMvcRequestBuilders
-				.get("/item-from-service")
+				.get("/item/1")
 				.accept(MediaType.APPLICATION_JSON);
 		
 		MvcResult result = mockMvc.perform(request)
 				.andExpect(status().isOk())
 				.andExpect(content().json("{\"id\":2,\"name\":\"Item 2\",\"price\":5,\"quantity\":20}"))
+				.andReturn();			
+	}
+
+	
+	
+	@Test
+	public void getAllItem_basic() throws Exception {
+		
+		when(businessService.findAllItems()).thenReturn(Arrays.asList(new Item(2,"Item 2", 5,20)));
+		
+		RequestBuilder request = MockMvcRequestBuilders
+				.get("/All")
+				.accept(MediaType.APPLICATION_JSON);
+		
+		MvcResult result = mockMvc.perform(request)
+				.andExpect(status().isOk())
+				.andExpect(content().json("[{\"id\":2,\"name\":\"Item 2\",\"price\":5,\"quantity\":20}]"))
 				.andReturn();			
 	}
 }
